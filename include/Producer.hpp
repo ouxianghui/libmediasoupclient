@@ -38,8 +38,8 @@ namespace mediasoupclient
 		  Listener* listener,
 		  const std::string& id,
 		  const std::string& localId,
-		  webrtc::RtpSenderInterface* rtpSender,
-		  webrtc::MediaStreamTrackInterface* track,
+			rtc::scoped_refptr<webrtc::RtpSenderInterface> rtpSender,
+			rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track,
 		  const nlohmann::json& rtpParameters,
 		  const nlohmann::json& appData);
 
@@ -48,8 +48,8 @@ namespace mediasoupclient
 		const std::string& GetLocalId() const;
 		bool IsClosed() const;
 		std::string GetKind() const;
-		webrtc::RtpSenderInterface* GetRtpSender() const;
-		webrtc::MediaStreamTrackInterface* GetTrack() const;
+		rtc::scoped_refptr<webrtc::RtpSenderInterface> GetRtpSender() const;
+		rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> GetTrack() const;
 		const nlohmann::json& GetRtpParameters() const;
 		bool IsPaused() const;
 		uint8_t GetMaxSpatialLayer() const;
@@ -79,9 +79,9 @@ namespace mediasoupclient
 		// Closed flag.
 		bool closed{ false };
 		// Associated RTCRtpSender.
-		webrtc::RtpSenderInterface* rtpSender{ nullptr };
+		rtc::scoped_refptr<webrtc::RtpSenderInterface> rtpSender{ nullptr };
 		// Local track.
-		webrtc::MediaStreamTrackInterface* track{ nullptr };
+		rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track{ nullptr };
 		// RTP parameters.
 		nlohmann::json rtpParameters;
 		// Paused flag.

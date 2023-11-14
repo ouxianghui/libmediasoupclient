@@ -174,7 +174,7 @@ namespace mediasoupclient
 	 */
 	Producer* SendTransport::Produce(
 	  Producer::Listener* producerListener,
-	  webrtc::MediaStreamTrackInterface* track,
+		rtc::scoped_refptr<webrtc::MediaStreamTrackInterface> track,
 	  const std::vector<webrtc::RtpEncodingParameters>* encodings,
 	  const json* codecOptions,
 	  const json* codec,
@@ -240,7 +240,7 @@ namespace mediasoupclient
 		  producerListener,
 		  producerId,
 		  sendResult.localId,
-		  sendResult.rtpSender.get(),
+		  sendResult.rtpSender,
 		  track,
 		  sendResult.rtpParameters,
 		  appData);
@@ -435,8 +435,8 @@ namespace mediasoupclient
 		  id,
 		  recvResult.localId,
 		  producerId,
-		  recvResult.rtpReceiver.get(),
-		  recvResult.track.get(),
+		  recvResult.rtpReceiver,
+		  recvResult.track,
 		  *rtpParameters,
 		  appData);
 

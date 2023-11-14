@@ -1,11 +1,16 @@
 #ifndef MSC_PEERCONNECTION_HPP
 #define MSC_PEERCONNECTION_HPP
 
-#include "api/set_local_description_observer_interface.h"
+#include "Logger.hpp"
 #include <json.hpp>
 #include <api/peer_connection_interface.h> // webrtc::PeerConnectionInterface
+#include <api/set_local_description_observer_interface.h>
+#include <api/set_remote_description_observer_interface.h>
 #include <future>                          // std::promise, std::future
 #include <memory>                          // std::unique_ptr
+#include "Logger.hpp"
+#include "MediaSoupClientErrors.hpp"
+#include "Utils.hpp"
 
 namespace mediasoupclient
 {
@@ -49,40 +54,6 @@ namespace mediasoupclient
 			void OnInterestingUsage(int usagePattern) override;
 		};
 
-		class SetLocalDescriptionObserver : public webrtc::SetLocalDescriptionObserverInterface
-		{
-		public:
-			SetLocalDescriptionObserver()           = default;
-			~SetLocalDescriptionObserver() override = default;
-
-			std::future<void> GetFuture();
-			void Reject(const std::string& error);
-
-			/* Virtual methods inherited from webrtc::SetLocalDescriptionObserver. */
-		public:
-			void OnSetLocalDescriptionComplete(webrtc::RTCError error) override;
-
-		private:
-			std::promise<void> promise;
-		};
-
-		class SetRemoteDescriptionObserver : public webrtc::SetRemoteDescriptionObserverInterface
-		{
-		public:
-			SetRemoteDescriptionObserver()           = default;
-			~SetRemoteDescriptionObserver() override = default;
-
-			std::future<void> GetFuture();
-			void Reject(const std::string& error);
-
-			/* Virtual methods inherited from webrtc::SetRemoteDescriptionObserver. */
-		public:
-			void OnSetRemoteDescriptionComplete(webrtc::RTCError error) override;
-
-		private:
-			std::promise<void> promise;
-		};
-
 		class SetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver
 		{
 		public:
@@ -96,6 +67,42 @@ namespace mediasoupclient
 		public:
 			void OnSuccess() override;
 			void OnFailure(webrtc::RTCError error) override;
+
+		private:
+			std::promise<void> promise;
+		};
+
+		class SetLocalDescriptionObserver: public webrtc::SetLocalDescriptionObserverInterface
+		{
+		public:
+			SetLocalDescriptionObserver()           = default;
+			~SetLocalDescriptionObserver() override = default;
+
+			void Reject(const std::string& error);
+
+			std::future<void> GetFuture();
+
+			/* Virtual methods inherited from webrtc::SetSessionDescriptionObserver. */
+		public:
+			void OnSetLocalDescriptionComplete(webrtc::RTCError error) override;
+
+		private:
+			std::promise<void> promise;
+		};
+
+		class SetRemoteDescriptionObserver: public webrtc::SetRemoteDescriptionObserverInterface
+		{
+		public:
+			SetRemoteDescriptionObserver()           = default;
+			~SetRemoteDescriptionObserver() override = default;
+
+			void Reject(const std::string& error);
+
+			std::future<void> GetFuture();
+
+			/* Virtual methods inherited from webrtc::SetSessionDescriptionObserver. */
+		public:
+			void OnSetRemoteDescriptionComplete(webrtc::RTCError error) override;
 
 		private:
 			std::promise<void> promise;
@@ -139,7 +146,7 @@ namespace mediasoupclient
 		struct Options
 		{
 			webrtc::PeerConnectionInterface::RTCConfiguration config;
-			webrtc::PeerConnectionFactoryInterface* factory{ nullptr };
+			rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> factory{ nullptr };
 		};
 
 	public:
@@ -174,10 +181,10 @@ namespace mediasoupclient
 		std::unique_ptr<rtc::Thread> signalingThread;
 		std::unique_ptr<rtc::Thread> workerThread;
 
-		// PeerConnection factory.
+					 // PeerConnection factory.
 		rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peerConnectionFactory;
 
-		// PeerConnection instance.
+					 // PeerConnection instance.
 		rtc::scoped_refptr<webrtc::PeerConnectionInterface> pc;
 	};
 } // namespace mediasoupclient
