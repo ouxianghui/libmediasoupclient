@@ -35,7 +35,7 @@ namespace mediasoupclient
 				// RTP (1).
 				candidateObject["component"]  = 1;
 				candidateObject["foundation"] = candidate["foundation"];
-				candidateObject["ip"]         = candidate["ip"];
+                candidateObject["ip"]         = candidate["address"];
 				candidateObject["port"]       = candidate["port"];
 				candidateObject["priority"]   = candidate["priority"];
 				candidateObject["transport"]  = candidate["protocol"];

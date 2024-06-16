@@ -38,8 +38,9 @@ namespace mediasoupclient
 			// Engine based on the Mersenne Twister 19937 (64 bits).
 			static std::mt19937_64 rng(seed);
 
-			// Uniform distribution for integers in the [min, max) range.
-			std::uniform_int_distribution<T> dis(min, max);
+            // Uniform distribution for integers in the [min, max) range.
+            // https://en.cppreference.com/w/cpp/numeric/random/uniform_int_distribution, [min, max]
+            std::uniform_int_distribution<T> dis(min, max - 1);
 
 			return dis(rng);
 		}

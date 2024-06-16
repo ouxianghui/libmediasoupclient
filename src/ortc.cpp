@@ -759,7 +759,7 @@ namespace mediasoupclient
 
 			auto foundationIt = params.find("foundation");
 			auto priorityIt   = params.find("priority");
-			auto ipIt         = params.find("ip");
+            auto addressIt    = params.find("address");
 			auto protocolIt   = params.find("protocol");
 			auto portIt       = params.find("port");
 			auto typeIt       = params.find("type");
@@ -777,9 +777,9 @@ namespace mediasoupclient
 				MSC_THROW_TYPE_ERROR("missing params.priority");
 
 			// ip is mandatory.
-			if (ipIt == params.end() || (!ipIt->is_string() || ipIt->get<std::string>().empty()))
+            if (addressIt == params.end() || (!addressIt->is_string() || addressIt->get<std::string>().empty()))
 			{
-				MSC_THROW_TYPE_ERROR("missing params.ip");
+                MSC_THROW_TYPE_ERROR("missing params.address");
 			}
 
 			// protocol is mandatory.
@@ -1208,7 +1208,7 @@ namespace mediasoupclient
 
 		/**
 		 * Generate RTP parameters of the given kind for sending media.
-		 * Just the first media codec per kind is considered.
+		 * All media codecs with matching kind are considered.
 		 * NOTE: mid, encodings and rtcp fields are left empty.
 		 */
 		json getSendingRtpParameters(const std::string& kind, const json& extendedRtpCapabilities)
@@ -1270,9 +1270,6 @@ namespace mediasoupclient
 
 					rtpParameters["codecs"].push_back(rtxCodec);
 				}
-
-				// NOTE: We assume a single media codec plus an optional RTX codec.
-				break;
 			}
 
 			for (const auto& extendedExtension : extendedRtpCapabilities["headerExtensions"])
@@ -1364,9 +1361,6 @@ namespace mediasoupclient
 
 					rtpParameters["codecs"].push_back(rtxCodec);
 				}
-
-				// NOTE: We assume a single media codec plus an optional RTX codec.
-				break;
 			}
 
 			for (const auto& extendedExtension : extendedRtpCapabilities["headerExtensions"])
@@ -1580,7 +1574,7 @@ namespace mediasoupclient
 			{
 				for (int idx = 0; idx < codecs.size(); ++idx)
 				{
-					if (matchCodecs(codecs[idx], const_cast<json&>(*capCodec)))
+					if (matchCodecs(codecs[idx], const_cast<json&>(*capCodec)), /*strict*/ true)
 					{
 						filteredCodecs.push_back(codecs[idx]);
 
